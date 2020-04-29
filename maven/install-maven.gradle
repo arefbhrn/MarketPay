@@ -1,0 +1,54 @@
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.arefbhrn.libraries'
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+            name 'MarketPay'
+            description 'In-App Payment Library for Android Markets'
+            url 'https://github.com/arefbhrn/MarketPay'
+            inceptionYear '2020'
+
+            packaging 'aar'
+            groupId 'com.arefbhrn.libraries'
+            artifactId project.artifact_id
+            version '1.0.0'
+
+            licenses {
+                license {
+                    name 'The Apache Software License, Version 2.0'
+                    url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                }
+            }
+            scm {
+                connection 'https://github.com/arefbhrn/MarketPay'
+                developerConnection 'https://github.com/arefbhrn/MarketPay'
+                url 'https://github.com/arefbhrn/MarketPay'
+            }
+            developers {
+                developer {
+                    id = 'arefbhrn'
+                    name 'Aref Bahreini Nejad'
+                    email 'arefbhrn@gmail.com'
+                }
+            }
+        }
+    }
+}
+
+if (android.productFlavors.size() > 0) {
+    android.libraryVariants.all { variant ->
+        if (variant.name.toLowerCase().contains("debug")) {
+            return
+        }
+        def bundleTask = tasks["bundle${variant.name.capitalize()}Aar"]
+        artifacts {
+            archives(bundleTask.archivePath) {
+                classifier variant.name.capitalize().replace("Release", "")
+                builtBy bundleTask
+                name = project.name
+            }
+        }
+    }
+}

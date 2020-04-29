@@ -1,0 +1,75 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'org.jetbrains.dokka'
+
+ext {
+    package_id = 'MarketPay'
+    artifact_id = 'marketpay'
+}
+
+android {
+    compileSdkVersion buildVersions.compileSdkVersion
+    buildToolsVersion buildVersions.buildToolsVersion
+    defaultConfig {
+        minSdkVersion buildVersions.minSdkVersion
+        targetSdkVersion buildVersions.targetSdkVersion
+        versionCode 1
+        versionName marketPayVersion
+        consumerProguardFiles 'consumer-rules.pro'
+        manifestPlaceholders = [storePermission: ""]
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    flavorDimensions "markets"
+    productFlavors {
+        bazaar {
+            buildConfigField "String", "MARKET_NAME", "\"Bazaar\""
+            buildConfigField "String", "MARKET_APPLICATION_ID", "\"com.farsitel.bazaar\""
+            buildConfigField "String", "BILLING_SERVICE_ACTION", "\"ir.cafebazaar.pardakht.InAppBillingService.BIND\""
+            manifestPlaceholders.storePermission = "com.farsitel.bazaar.permission.PAY_THROUGH_BAZAAR"
+        }
+        myket {
+            buildConfigField "String", "MARKET_NAME", "\"Myket\""
+            buildConfigField "String", "MARKET_APPLICATION_ID", "\"ir.mservices.market\""
+            buildConfigField "String", "BILLING_SERVICE_ACTION", "\"ir.mservices.market.InAppBillingService.BIND\""
+            manifestPlaceholders.storePermission = "ir.mservices.market.BILLING"
+        }
+        iranapps {
+            buildConfigField "String", "MARKET_NAME", "\"IranApps\""
+            buildConfigField "String", "MARKET_APPLICATION_ID", "\"ir.tgbs.android.iranapp\""
+            buildConfigField "String", "BILLING_SERVICE_ACTION", "\"ir.tgbs.iranapps.billing.InAppBillingService.BIND\""
+            manifestPlaceholders.storePermission = "ir.tgbs.iranapps.permission.BILLING"
+        }
+    }
+    dokka {
+        outputFormat = 'html'
+        outputDirectory = "$buildDir/kotlindoc"
+        configuration {
+            skipEmptyPackages = true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+dependencies {
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$libraryVersions.kotlin"
+
+    api "androidx.fragment:fragment:$libraryVersions.fragment"
+
+}
+
+apply from: "$rootDir/maven/install-maven.gradle"

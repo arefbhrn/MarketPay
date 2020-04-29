@@ -1,0 +1,2 @@
+include ':app', ':marketpay', ':marketpay-rxbase', ':marketpay-rx', ':marketpay-rx3'
+rootProject.name='MarketPay'
