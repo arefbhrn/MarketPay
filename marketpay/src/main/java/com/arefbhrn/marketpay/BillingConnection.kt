@@ -41,8 +41,9 @@ internal class BillingConnection(
     private var billingService: IInAppBillingService? = null
 
     internal fun startConnection(connectionCallback: ConnectionCallback.() -> Unit): Connection {
+        val packageName: String? = if (MARKET_PACKAGE_NAME.isEmpty()) null else MARKET_PACKAGE_NAME
         callback = ConnectionCallback(disconnect = ::stopConnection).apply(connectionCallback)
-        Intent(BILLING_SERVICE_ACTION).apply { `package` = MARKET_PACKAGE_NAME }
+        Intent(BILLING_SERVICE_ACTION).apply { `package` = packageName }
             .takeIf(
                 thisIsTrue = {
                     context.packageManager.queryIntentServices(it, 0).isNullOrEmpty().not()
@@ -53,6 +54,14 @@ internal class BillingConnection(
             )
             ?.also {
                 try {
+                    if (packageName.isNullOrEmpty()) {
+                        it.setPackage(
+                            context.packageManager.queryIntentServices(
+                                it,
+                                0
+                            )[0].serviceInfo.packageName
+                        );
+                    }
                     context.bindService(it, this, Context.BIND_AUTO_CREATE)
                 } catch (e: SecurityException) {
                     callback?.connectionFailed?.invoke(e)

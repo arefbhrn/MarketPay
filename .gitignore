@@ -39,3 +39,4 @@ app/build/*
 *.apk
 app/production
 app/release
+asset/*.psd
